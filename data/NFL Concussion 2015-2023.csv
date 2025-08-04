@@ -1,5 +1,4 @@
-,Preseason,,,Regular Season,,,Preseason + Regular Season,,
-Year,Game,Practice,Total,Game,Practice,Total,Game,Practice,Total
+Year,Preseason_Game,Preseason_Practice,Preseason_Total,Regular_Game,Regular_Practice,Regular_Total,Combined_Game,Combined_Practice,Combined_Total
 2015,54,29,83,183,9,192,237,38,275
 2016,45,26,71,166,6,172,211,32,243
 2017,46,45,91,179,11,190,225,56,281
@@ -9,3 +8,4 @@ Year,Game,Practice,Total,Game,Practice,Total,Game,Practice,Total
 2021,22,30,52,126,9,135,148,39,187
 2022,27,25,52,149,12,161,176,37,213
 2023,32,26,58,152,9,161,184,35,219
+2024,26,18,44,129,9,138,155,27,182

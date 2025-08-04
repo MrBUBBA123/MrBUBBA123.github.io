@@ -1,7 +1,48 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Interactive Visualization of Concussions in the NFL (2015-2024)</title>
+        <link rel="stylesheet" href="css/style.css" type="text/css">
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+    </head>
     <body>
-        <h1>Hello World</h1>
-        <p>I'm hosted with GitHub Pages.</p>
+        <h1>Narrative Visualization to Study the Impact of the NFL's Player Safety Initiatives for Concussions</h1>
+        <div class="overview">
+            <p1>The NFL previously ignored decades of research on the degenerative long-term effects of brain trauma, and didn’t take enough steps to protect its employees. Thousands of now-settled lawsuits brought on by former players forced the NFL to change their ways. Through this narrative visualization, we dive into the correlation between the NFL’s increased safety measures and the number of concussions spanning the last decade.</p>
+        </div>
+
+        <div>
+            <p2>Data Source: <a href="https://www.nfl.com/playerhealthandsafety/health-and-wellness/injury-data/injury-data" target="_blank">NFL Concussion Data</a></p2>
+        </div>
+
+        <div id="navigation">
+            <button id="scene1-btn">Scene 1 (2015-2018)</button>
+            <button id="scene2-btn">Scene 2 (2015-2021)</button>
+            <button id="scene3-btn">Scene 3 (2015-2024)</button>
+        </div>
+
+        <div id="controls">
+            <label for="dataTypeSelect">Display Data: </label>
+            <select id="dataTypeSelect">
+                <option value="combined" selected>Combined Concussions</option>
+                <option value="preseason">Preseason Concussions</option>
+                <option value="regularSeason">Regular Season Concussions</option>
+            </select>
+        </div>
+
+        <div id="chart"></div>
+        <script src="js/narrative-viz.js"></script>
+
+        <div id="notification-box">
+            <div class="notification-header">
+                <span class="notification-icon">ℹ️</span>
+                <strong>Important Context: NFL Season Structure Changes</strong>
+            </div>
+            <div class="notification-content">
+                <p>2015-2019: 4 Preseason Games and 16 Regular Season Games per Team</p>
+                <p>2020: 0 Preseason Games and 16 Regular Season Games (Covid-19)</p>
+                <p>2021-2024: 3 Preseason Games and 17 Regular Season Games per Team</p>
+            </div>
+        </div>
     </body>
 </html>
