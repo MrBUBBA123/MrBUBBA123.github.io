@@ -11,15 +11,15 @@ async function loadConcussionData()
         const processedData = data.map(d => {
             return {
                 year: +d.Year,
-                // Preseason
+                // preseason
                 preseasonPractice: +d["Preseason_Practice"],
                 preseasonGame: d["Preseason_Game"] === "N/A" ? 0 : +d["Preseason_Game"], 
                 preseasonTotal: +d["Preseason_Total"],
-                // Regular Season  
+                // regular season  
                 regularSeasonPractice: +d["Regular_Practice"],
                 regularSeasonGame: +d["Regular_Game"],
                 regularSeasonTotal: +d["Regular_Total"],
-                // Combined
+                // combined
                 combinedPractice: +d["Combined_Practice"],
                 combinedGame: +d["Combined_Game"], 
                 combinedTotal: +d["Combined_Total"]
@@ -32,6 +32,21 @@ async function loadConcussionData()
         return [];
     }
 }
+
+// ===== TUTORIAL STATE =====
+let tutorialStep = 0;
+let scenesCompleted = [false, false, false]; // track which scenes have been viewed
+let tutorialActive = true;
+let allowedScenes = [true, false, false]; // shich scenes user can access
+
+const tutorialSteps = [
+    { text: "You can navigate the scenes at the top of the page", target: "#navigation" },
+    { text: "You can control the parameters where it says 'Display Data'", target: "#controls" },
+    { text: "Steps the NFL has taken to reduce concussions can be found right of the chart", target: ".annotation-box" },
+    { text: "Showing scene 1 for 2015-2018. Click the scene 2 button to go to the next scene.", target: "#navigation" },
+    { text: "Showing scene 2 for 2015-2021. Click the scene 3 button to go to the next scene.", target: "#navigation" },
+    { text: "You have viewed all of the scenes, feel free to explore with the Display Data dropdown filter.", target: "#navigation" }
+];
 
 // ===== PARAMETERS =====
 let currentScene = 1;
@@ -81,13 +96,13 @@ function getAnnotationColor(type)
 {
     switch(type) {
         case 'helmet':
-            return '#ffa600'; // Orange for helmet updates
+            return '#ffa600'; // helmet updates
         case 'protocol':
-            return '#2f4b7c'; // Dark blue for protocol changes
+            return '#2f4b7c'; // protocol changes
         case 'rule':
-            return '#665191'; // Purple for rule changes
+            return '#665191'; // rule changes
         default:
-            return '#17d721ff'; // green otherwise
+            return '#17d721ff'; // otherwise
     }
 }
 
@@ -105,7 +120,6 @@ function animateLine(path, delay = 0)
         .attr('stroke-dashoffset', 0);
 }
 
-// ===== CHART CREATION FUNCTIONS =====
 function createChart(data, sceneAnnotations, category) 
 {
     d3.select('#chart').selectAll('*').remove();
@@ -149,7 +163,7 @@ function createChart(data, sceneAnnotations, category)
         totalField = 'regularSeasonTotal';
     }
 
-    // Scales
+    // scales
     const xScale = d3.scaleLinear()
         .domain(d3.extent(data, d => d.year))
         .range([0, width]);
@@ -159,7 +173,7 @@ function createChart(data, sceneAnnotations, category)
         .domain([0, yMax + 20]) 
         .range([height, 0]);
 
-    // Horizontal grid lines
+    // horizontal grid lines
     svg.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(yScale)
@@ -170,7 +184,7 @@ function createChart(data, sceneAnnotations, category)
         .style('stroke-dasharray', '3,3')
         .style('opacity', 0.3);
 
-    // Vertical grid lines
+    // vertical grid lines
     svg.append('g')
         .attr('class', 'grid')
         .attr('transform', `translate(0,${height})`)
@@ -182,7 +196,7 @@ function createChart(data, sceneAnnotations, category)
         .style('stroke-dasharray', '3,3')
         .style('opacity', 0.3);
 
-    // Axes
+    // axes
     const xAxis = d3.axisBottom(xScale)
         .ticks(data.length)
         .tickFormat(d3.format('d'))
@@ -194,20 +208,20 @@ function createChart(data, sceneAnnotations, category)
         .tickSize(6)
         .tickPadding(8);
 
-    // X axis
+    // x axis
     svg.append('g')
         .attr('class', 'x-axis')
         .attr('transform', `translate(0,${height})`)
         .call(xAxis)
         .style('font-size', '12px');
 
-    // Y axis
+    // y axis
     svg.append('g')
         .attr('class', 'y-axis')
         .call(yAxis)
         .style('font-size', '12px');
 
-    // Style axis lines
+    // style axis lines
     svg.selectAll('.x-axis path, .y-axis path')
         .style('stroke', '#000')
         .style('stroke-width', 1);
@@ -216,7 +230,7 @@ function createChart(data, sceneAnnotations, category)
         .style('stroke', '#000')
         .style('stroke-width', 1);
 
-    // Axis labels
+    // axis labels
     svg.append('text')
         .attr('x', width / 2)
         .attr('y', height + margin.bottom - 10)
@@ -234,7 +248,7 @@ function createChart(data, sceneAnnotations, category)
         .style('font-weight', 'bold')
         .text('Number of Concussions');
 
-    // Line generators
+    // line generators
     const linePractice = d3.line()
         .x(d => xScale(d.year))
         .y(d => yScale(d[practiceField]))
@@ -250,7 +264,7 @@ function createChart(data, sceneAnnotations, category)
         .y(d => yScale(d[totalField]))
         .curve(d3.curveMonotoneX);
 
-    // Draw lines
+    // draw lines
     const practicePath = svg.append('path')
         .datum(data)
         .attr('class', 'practice-line')
@@ -282,7 +296,7 @@ function createChart(data, sceneAnnotations, category)
     animateLine(gamePath, 0);
     animateLine(totalPath, 0);
 
-    // Add data points
+    // add data points
     svg.selectAll('.practice-dots')
     .data(data)
     .enter().append('circle')
@@ -361,7 +375,7 @@ svg.selectAll('.total-dots')
         tooltip.transition().duration(150).style('opacity', 0);
     });
 
-    // Add legend
+    // add legend
     const legendData = [
         {label: 'Practice', color: '#ff6b6b'},
         {label: 'Games', color: '#4ecdc4'},
@@ -394,7 +408,7 @@ svg.selectAll('.total-dots')
         .style('fill', '#333')
         .style('font-weight', '500');
 
-    // Add category indicator
+    // add category indicator
     svg.append('text')
         .attr('x', width / 2)
         .attr('y', -20)
@@ -425,7 +439,6 @@ function wrapTextToLines(text, maxWidth)
                 lines.push(currentLine);
                 currentLine = word;
             } else {
-                // Handle long words
                 lines.push(word);
                 currentLine = '';
             }
@@ -449,7 +462,7 @@ function getTextWidth(text, font)
 
 function addAnnotations(svg, annotations, xScale, yScale, height, width) 
 {
-    // Group annotations by year
+    // group annotations by year
     const annotationsByYear = {};
     annotations.forEach(annotation => {
         if (!annotationsByYear[annotation.year]) {
@@ -458,7 +471,7 @@ function addAnnotations(svg, annotations, xScale, yScale, height, width)
         annotationsByYear[annotation.year].push(annotation);
     });
 
-    // Sort years
+    // sort years
     const years = Object.keys(annotationsByYear).sort((a, b) => a - b);
     
     const yearColors = [
@@ -472,12 +485,12 @@ function addAnnotations(svg, annotations, xScale, yScale, height, width)
         '#34495e'  
     ];
     
-    // Add vertical lines for each year with distinct colors
+    // add vertical lines for each year with distinct colors
     years.forEach((year, index) => {
         const x = xScale(+year);
         const yearColor = yearColors[index % yearColors.length];
         
-        // Create vertical dashed line
+        // create vertical dashed line
         svg.append('line')
             .attr('class', 'annotation-line')
             .attr('x1', x)
@@ -489,7 +502,6 @@ function addAnnotations(svg, annotations, xScale, yScale, height, width)
             .attr('stroke-dasharray', '5,5')
             .attr('opacity', 0.8);
 
-        // Add circle at top of line
         svg.append('circle')
             .attr('cx', x)
             .attr('cy', -20)
@@ -504,7 +516,7 @@ function addAnnotations(svg, annotations, xScale, yScale, height, width)
 
 function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearColors) 
 {
-    const boxStartX = chartWidth + 180; // Position after legend
+    const boxStartX = chartWidth + 180;
     const boxWidth = 300;
     const boxSpacing = 20;
     let currentY = 0;
@@ -513,13 +525,13 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
         const yearAnnotations = annotationsByYear[year];
         const yearColor = yearColors[yearIndex % yearColors.length];
         
-        // Calculate proper box height based on wrapped text content
+        // cakc proper box height based on wrapped text content
         const titleHeight = 25;
         const lineHeight = 16;
         const padding = 12;
         const bulletSpacing = 8;
         
-        // Calculate total lines needed for all annotations
+        // calc total lines needed for all annotations
         let totalLines = 0;
         const wrappedAnnotations = yearAnnotations.map(annotation => {
             const lines = wrapTextToLines(annotation.text, boxWidth - 30);
@@ -527,7 +539,6 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
             return { ...annotation, lines };
         });
         
-        // Add extra spacing between bullet points (but not after the last one)
         const extraSpacing = (yearAnnotations.length - 1) * bulletSpacing;
         const boxHeight = titleHeight + padding + (totalLines * lineHeight) + extraSpacing + padding;
 
@@ -545,7 +556,7 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
             .attr('stroke-width', 1)
             .attr('rx', 6);
 
-        // Add year title with colored background strip
+        // add year title
         boxGroup.append('rect')
             .attr('x', 0)
             .attr('y', 0)
@@ -561,7 +572,7 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
             .attr('height', 13)
             .attr('fill', yearColor);
 
-        // Add year text
+        // add year text
         boxGroup.append('text')
             .attr('x', padding)
             .attr('y', 18)
@@ -570,19 +581,19 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
             .style('font-weight', 'bold')
             .style('fill', '#fff');
 
-        // Add annotation texts with proper spacing
+        // add annotation texts with proper spacing
         let currentTextY = titleHeight + padding;
         
         wrappedAnnotations.forEach((annotation, annotationIndex) => {
-            // Add colored type indicator at the start of each bullet point
+            // add colored type indicator at the start of each bullet point
             const typeColor = getAnnotationColor(annotation.type);
             boxGroup.append('circle')
                 .attr('cx', padding + 6)
-                .attr('cy', currentTextY + 8) // Position at first line of text
+                .attr('cy', currentTextY + 8) // position at first line of text
                 .attr('r', 3)
                 .attr('fill', typeColor);
 
-            // Add each line of wrapped text
+            // add each line of wrapped text
             annotation.lines.forEach((line, lineIndex) => {
                 boxGroup.append('text')
                     .attr('x', padding + 18)
@@ -593,53 +604,164 @@ function createAnnotationBoxes(svg, annotationsByYear, chartWidth, years, yearCo
                     .style('font-family', 'Arial, sans-serif');
             });
 
-            // Move Y position for next annotation
+            // move Y position for next annotation
             currentTextY += (annotation.lines.length * lineHeight) + bulletSpacing;
         });
 
-        // Update Y position for next box
+        // update Y position for next box
         currentY += boxHeight + boxSpacing;
     });
+}
+
+// ===== TUTORIAL FUNCTIONS =====
+function showTutorialStep(step) {
+    const overlay = d3.select('#tutorial-overlay');
+    const text = d3.select('#tutorial-text');
+    
+    if (step < tutorialSteps.length) {
+        text.text(tutorialSteps[step].text);
+        overlay.style('display', 'flex');
+    }
+}
+
+function closeTutorialStep() {
+    d3.select('#tutorial-overlay').style('display', 'none');
+    tutorialStep++;
+    
+    switch(tutorialStep) {
+        case 1:
+            // after navigation explanation, show controls
+            showTutorialStep(1);
+            break;
+        case 2:
+            setTimeout(() => showTutorialStep(2), 1000);
+            break;
+        case 3:
+            // hide controls dropdown
+            d3.select('#controls').classed('hidden', true);
+            updateButtonStates();
+            showTutorialStep(3);
+            break;
+        case 4:
+            // allow scene 2, show scene 2 message when clicked
+            allowedScenes[1] = true;
+            updateButtonStates();
+            break;
+        case 5:
+            // allow scene 3
+            allowedScenes[2] = true;
+            updateButtonStates();
+            break;
+        case 6:
+            // tutorial complete, show controls again
+            d3.select('#controls').classed('hidden', false);
+            tutorialActive = false;
+            break;
+    }
+}
+
+function updateButtonStates() {
+    const buttons = ['#scene1-btn', '#scene2-btn', '#scene3-btn'];
+    
+    buttons.forEach((buttonId, index) => {
+        const button = d3.select(buttonId);
+        
+        // remove all state classes
+        button.classed('completed available unavailable current', false);
+        
+        if (scenesCompleted[index]) {
+            button.classed('completed', true);
+        } else if (allowedScenes[index]) {
+            if (currentScene === index + 1) {
+                button.classed('current', true);
+            } else {
+                button.classed('available', true);
+            }
+        } else {
+            button.classed('unavailable', true);
+        }
+    });
+}
+
+function checkAllScenesViewed() {
+    return scenesCompleted.every(completed => completed);
 }
 
 // ===== SCENE FUNCTIONS =====
 function showScene1() 
 {
+    if (tutorialActive && !allowedScenes[0]) return;
+    
     const scene1Data = concussionData.filter(d => d.year >= 2015 && d.year <= 2018);
     clearChart();
     createChart(scene1Data, annotations.scene1, selectedCategory);
     updateNavigation(1);
+    scenesCompleted[0] = true;
+    updateButtonStates();
 }
 
 function showScene2() 
 {
+    if (tutorialActive && !allowedScenes[1]) return;
+    
     const scene2Data = concussionData.filter(d => d.year >= 2015 && d.year <= 2021);
     clearChart();
     createChart(scene2Data, annotations.scene2, selectedCategory);
     updateNavigation(2);
+    scenesCompleted[1] = true;
+    updateButtonStates();
+    
+    // show next tutorial step if in tutorial mode
+    if (tutorialActive && tutorialStep === 4) {
+        setTimeout(() => showTutorialStep(4), 1000);
+    }
 }
 
 function showScene3() 
 {
+    if (tutorialActive && !allowedScenes[2]) return;
+    
     const scene3Data = concussionData.filter(d => d.year >= 2015 && d.year <= 2024);
     clearChart();
     createChart(scene3Data, annotations.scene3, selectedCategory);
     updateNavigation(3);
+    scenesCompleted[2] = true;
+    updateButtonStates();
+    
+    // check if all scenes completed
+    if (checkAllScenesViewed() && tutorialActive && tutorialStep === 5) {
+        setTimeout(() => showTutorialStep(5), 1000);
+    }
 }
 
-// ===== TRIGGERS (Event Handlers) =====
+function showExploreMode() 
+{
+    if (tutorialActive) return; // don't allow explore mode during tutorial
+    
+    clearChart();
+    createChart(concussionData, [], selectedCategory);
+    updateNavigation(4);
+}
+
+// ===== TRIGGERS =====
 function setupTriggers() 
 {
-    // Navigation buttons
+    // tutorial close button
+    d3.select("#tutorial-close").on("click", closeTutorialStep);
+    
+    // navigation buttons
     d3.select("#scene1-btn").on("click", showScene1);
     d3.select("#scene2-btn").on("click", showScene2);
     d3.select("#scene3-btn").on("click", showScene3);
+    d3.select("#explore-btn").on("click", showExploreMode);
     
-    // Dropdown change event
+    // dropdown change event (only when not in tutorial mode)
     d3.select("#dataTypeSelect").on("change", function() {
+        if (tutorialActive) return;
+        
         selectedCategory = this.value;
         
-        // Redraw current scene with new category
+        // redraw current scene with new category
         switch(currentScene) {
             case 1:
                 showScene1();
@@ -649,6 +771,9 @@ function setupTriggers()
                 break;
             case 3:
                 showScene3();
+                break;
+            case 4:
+                showExploreMode();
                 break;
         }
     });
@@ -662,13 +787,13 @@ function clearChart()
 
 function updateNavigation(activeScene) 
 {
-    // Update current scene tracker
+    // update current scene tracker
     currentScene = activeScene;
     
-    // Remove active class from all buttons
+    // remove active class from all buttons
     d3.selectAll('#navigation button').classed('active', false);
     
-    // Add active class to current scene button
+    // add active class to current scene button
     const buttonIds = ['#scene1-btn', '#scene2-btn', '#scene3-btn'];
     if (activeScene >= 1 && activeScene <= 4) {
         d3.select(buttonIds[activeScene - 1]).classed('active', true);
@@ -692,7 +817,12 @@ async function init()
     // set up visualization
     setupTriggers();
     showScene1();
+
+    // start tutorial after chart loads
+    setTimeout(() => {
+        showTutorialStep(0);
+    }, 1500);
 }
 
-// Start when DOM is loaded
+// start when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
